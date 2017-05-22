@@ -125,7 +125,6 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         circleGClass: "conceptG",
         graphClass: "graph",
         activeEditId: "active-editing",
-        BACKSPACE_KEY: 8,
         DELETE_KEY: 46,
         ENTER_KEY: 13,
         nodeRadius: 25
@@ -140,19 +139,6 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         } else {
             d.x += d3.event.dx;
             d.y += d3.event.dy;
-            thisGraph.updateGraph();
-        }
-    };
-
-    GraphCreator.prototype.deleteGraph = function (skipPrompt) {
-        var thisGraph = this,
-            doDelete = true;
-        if (!skipPrompt) {
-            doDelete = window.confirm("Press OK to delete this graph");
-        }
-        if (doDelete) {
-            thisGraph.nodes = [];
-            thisGraph.edges = [];
             thisGraph.updateGraph();
         }
     };
@@ -200,8 +186,38 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         if (thisGraph.state.selectedEdge) {
             thisGraph.removeSelectFromEdge();
         }
+
+        var failureRateEl = document.getElementById('failureRate');
+        var repairRateEl = document.getElementById('repairRate');
+        failureRateEl.removeEventListener('change', this.changeNodeData);
+        repairRateEl.removeEventListener('change', this.changeNodeData);
+        failureRateEl.removeEventListener('change', this.changeEdgeData);
+        repairRateEl.removeEventListener('change', this.changeEdgeData);
+
+        failureRateEl.value = edgeData.failureRate || 0;
+        repairRateEl.value = edgeData.repairRate || 0;
+
         thisGraph.state.selectedEdge = edgeData;
+
+        failureRateEl.addEventListener('change', this.changeEdgeData.bind(this));
+        repairRateEl.addEventListener('change', this.changeEdgeData.bind(this));
+
     };
+
+    GraphCreator.prototype.changeEdgeData = function (e) {
+        var thisGraph = this;
+        var selectedEdge = thisGraph.state.selectedEdge;
+        var id = e.target.getAttribute('id');
+        this.edges.forEach(function (edge) {
+            if (edge.source == selectedEdge.source && edge.target == selectedEdge.target) {
+                edge[id] = parseFloat(e.target.value);
+            }
+        });
+
+        thisGraph.updateEdgesList();
+    }
+
+
 
     GraphCreator.prototype.replaceSelectNode = function (d3Node, nodeData) {
         var thisGraph = this;
@@ -209,8 +225,35 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         if (thisGraph.state.selectedNode) {
             thisGraph.removeSelectFromNode();
         }
+
+        var failureRateEl = document.getElementById('failureRate');
+        var repairRateEl = document.getElementById('repairRate');
+        failureRateEl.removeEventListener('change', this.changeNodeData);
+        repairRateEl.removeEventListener('change', this.changeNodeData);
+        failureRateEl.removeEventListener('change', this.changeEdgeData);
+        repairRateEl.removeEventListener('change', this.changeEdgeData);
+
+        failureRateEl.value = nodeData.failureRate || 0;
+        repairRateEl.value = nodeData.repairRate || 0;
+
         thisGraph.state.selectedNode = nodeData;
+
+        failureRateEl.addEventListener('change', this.changeNodeData.bind(this));
+        repairRateEl.addEventListener('change', this.changeNodeData.bind(this));
     };
+
+    GraphCreator.prototype.changeNodeData = function (e) {
+        var thisGraph = this;
+        var selectedNode = thisGraph.state.selectedNode;
+        var id = e.target.getAttribute('id');
+        this.nodes.forEach(function (node) {
+            if (node.id == selectedNode.id) {
+                node[id] = parseFloat(e.target.value);
+            }
+        });
+
+        thisGraph.updateNodesList();
+    }
 
     GraphCreator.prototype.removeSelectFromNode = function () {
         var thisGraph = this;
@@ -297,11 +340,14 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
             .on("blur", function (d) {
                 // lets try something
                 var nodeTextContent = this.textContent;
-                d.reliability = nodeTextContent.split(';')[0];
-                d.availability = nodeTextContent.split(';')[1];
+                // d.failureRate = parseFloat(nodeTextContent.split(';')[0]);
+                // d.repairRate = parseFloat(nodeTextContent.split(';')[1]);
+                // console.log('%c Changed failure rate: ' + d.failureRate + ', repairRate: ' + d.repairRate, 'color: lightblue');
                 d.title = this.textContent;
                 thisGraph.insertTitleLinebreaks(d3node, d.title);
                 d3.select(this.parentElement).remove();
+
+                thisGraph.updateNodesList();
             });
         return d3txt;
     };
@@ -332,6 +378,11 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
             });
             if (!filtRes[0].length) {
                 thisGraph.edges.push(newEdge);
+                console.log('%c New EDGE created', 'color: yellow');
+                console.log(newEdge);
+                console.log(thisGraph.edges);
+                console.log('%c ==============', 'color: yellow');
+                // thisGraph.updateEdgesList();
                 thisGraph.updateGraph();
             }
         } else {
@@ -381,8 +432,13 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         } else if (state.graphMouseDown && d3.event.shiftKey) {
             // clicked not dragged from svg
             var xycoords = d3.mouse(thisGraph.svgG.node()),
-                d = { id: thisGraph.idct++, title: "Č", x: xycoords[0], y: xycoords[1] };
+                d = { id: thisGraph.idct++, title: "Č", x: xycoords[0], y: xycoords[1], failureRate: 0, repairRate: 0 };
             thisGraph.nodes.push(d);
+            console.log('%c New node created', 'color: lightgreen');
+            console.log(d);
+            console.log(thisGraph.nodes);
+            console.log('%c ==============', 'color: lightgreen');
+
             thisGraph.updateGraph();
             // make title of text immediently editable
             var d3txt = thisGraph.changeTextOfNode(thisGraph.circles.filter(function (dval) {
@@ -412,7 +468,6 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
             selectedEdge = state.selectedEdge;
 
         switch (d3.event.keyCode) {
-            case consts.BACKSPACE_KEY:
             case consts.DELETE_KEY:
                 d3.event.preventDefault();
                 if (selectedNode) {
@@ -522,7 +577,31 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         svg.attr("width", x).attr("height", y);
     };
 
+    GraphCreator.prototype.updateNodesList = function () {
+        var nodes = this.nodes;
+        var container = document.getElementById('nodes-list');
+        var tableBody = container.getElementsByTagName("tbody")[0];
+        tableBody.innerHTML = ''
 
+        var nodesHTML = nodes.map(function (node) {
+            return `<tr><td>${node.title}</td><td>${node.failureRate}</td><td>${node.repairRate}</td></tr>`;
+        }).join('');
+
+        tableBody.innerHTML = nodesHTML;
+    }
+
+    GraphCreator.prototype.updateEdgesList = function () {
+        var edges = this.edges;
+        var container = document.getElementById('edges-list');
+        var tableBody = container.getElementsByTagName("tbody")[0];
+        tableBody.innerHTML = ''
+
+        var edgesHTML = edges.map(function (edge) {
+            return `<tr><td>${edge.source.title} - ${edge.target.title}</td><td>${edge.failureRate || 0}</td><td>${edge.repairRate || 0}</td></tr>`;
+        }).join('');
+
+        tableBody.innerHTML = edgesHTML;
+    }
 
     /**** MAIN ****/
 
@@ -541,8 +620,8 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         yLoc = 100;
 
     // initial node data
-    var nodes = [{ title: "Č1", id: 0, x: xLoc, y: yLoc },
-    { title: "Č2", id: 1, x: xLoc, y: yLoc + 200 }];
+    var nodes = [{ title: "Č1", id: 0, x: xLoc, y: yLoc, repairRate: 0, failureRate: 0 },
+    { title: "Č2", id: 1, x: xLoc, y: yLoc + 200, repairRate: 0, failureRate: 0 }];
     var edges = [{ source: nodes[1], target: nodes[0], leng: 10 }];
 
 
