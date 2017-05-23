@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background: #bdc3c7 !important;
+    background: #3498db !important;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -66,8 +66,26 @@ g.selected circle {
     fill: rgb(250, 232, 255);
 }
 
-g.selected:hover circle {
-    fill: rgb(250, 232, 255);
+g.conceptG:hover #ellipse {
+    fill: #bb5045 !important;
+}
+
+g.conceptG:hover #ellipse-shadow {
+    fill: #ea6254 !important;
+}
+
+g.selected #ellipse {
+    fill: #c0392b !important;
+    color: white !important;
+}
+
+g.selected #ellipse-shadow {
+    fill: #e74c3c !important;
+    color: white !important;
+}
+
+g.selected tspan {
+    fill: white !important;
 }
 
 path.link {
@@ -101,7 +119,7 @@ path.link.selected {
 
 #legenda li {
     list-style: none;
-    color: black;
+    color: white;
 }
 
 #dashboard {

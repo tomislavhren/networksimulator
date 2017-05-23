@@ -552,8 +552,24 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
             })
             .call(thisGraph.drag);
 
-        newGs.append("circle")
-            .attr("r", String(consts.nodeRadius));
+        // newGs.append("circle")
+        //     .attr("r", String(consts.nodeRadius));
+
+        newGs.append("ellipse")
+            .attr("id", "ellipse")
+            .attr("style", "fill:#F39C12")
+            // .attr("cx", "365.832")
+            // .attr("cy", "265.546")
+            .attr("rx", "34.048")
+            .attr("ry", "30.113");
+
+        newGs.append("ellipse")
+            .attr("id", "ellipse-shadow")
+            .attr("style", "fill:#F1C40F")
+            // .attr("cx", "365.832")
+            .attr("cy", "-3")
+            .attr("rx", "34.048")
+            .attr("ry", "28.282");
 
         newGs.each(function (d) {
             thisGraph.insertTitleLinebreaks(d3.select(this), d.title);
