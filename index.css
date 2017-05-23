@@ -64,6 +64,10 @@ g.conceptG:active #ellipse-shadow {
     transform: translateY(3px) !important;
 }
 
+g.conceptG:hover tspan {
+    fill: white !important;
+}
+
 g.conceptG:hover #ellipse {
     fill: #bb5045 !important;
 }
@@ -74,12 +78,10 @@ g.conceptG:hover #ellipse-shadow {
 
 g.selected #ellipse {
     fill: #c0392b !important;
-    color: white !important;
 }
 
 g.selected #ellipse-shadow {
     fill: #e74c3c !important;
-    color: white !important;
 }
 
 g.selected tspan {
