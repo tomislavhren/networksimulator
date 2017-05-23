@@ -96,7 +96,7 @@ path.link {
 }
 
 path.link:hover {
-    stroke: rgb(94, 196, 204);
+    stroke: #e74c3c;
 }
 
 g.connect-node circle {
@@ -108,7 +108,7 @@ path.link.hidden {
 }
 
 path.link.selected {
-    stroke: rgb(229, 172, 247);
+    stroke: #c0392b;
 }
 
 #legenda {

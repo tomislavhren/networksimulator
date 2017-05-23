@@ -648,7 +648,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         height = window.innerHeight || docEl.clientHeight || bodyEl.clientHeight;
 
     var xLoc = width / 2 - 25,
-        yLoc = 100;
+        yLoc = height / 3;
 
     // initial node data
     var nodes = [{ title: "Č1", id: 0, x: xLoc, y: yLoc, repairRate: 0, failureRate: 0 },
