@@ -19,7 +19,7 @@
     </ul>
 
     <div id="dashboard">
-        <h3>Intenziteti</h3>
+        <h3>PARAMETRI</h3>
         <div class="form-group">
             <label for="failureRate">Intenzitet kvarova, &lambda;</label>
             <input class="form-control" type="number" id="failureRate">
@@ -27,6 +27,10 @@
         <div class="form-group">
             <label for="repairRate">Intenzitet popravka, &mu;</label>
             <input class="form-control" type="number" id="repairRate">
+        </div>
+        <div class="form-group">
+            <label for="linkLength">Duljina linka</label>
+            <input class="form-control" type="number" id="linkLength">
         </div>
     </div>
 
@@ -37,9 +41,9 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Ime</th>
-                        <th>&lambda;</th>
-                        <th>&mu;</th>
+                        <th title="Naziv čvora">Ime</th>
+                        <th title="Intenzitet kvarova">&lambda;</th>
+                        <th title="Intenzitet popravaka">&mu;</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,9 +58,10 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Ime</th>
-                        <th>&lambda;</th>
-                        <th>&mu;</th>
+                        <th title="Naziv linka">Ime</th>
+                        <th title="Intenzitet kvarova">&lambda;</th>
+                        <th title="Intenzitet popravaka">&mu;</th>
+                        <th title="Duljina linka">L, m</th>
                     </tr>
                 </thead>
                 <tbody>

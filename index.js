@@ -189,10 +189,13 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
 
         var failureRateEl = document.getElementById('failureRate');
         var repairRateEl = document.getElementById('repairRate');
+        var linkLengthEl = document.getElementById('linkLength');
         failureRateEl.removeEventListener('change', this.changeNodeData);
         repairRateEl.removeEventListener('change', this.changeNodeData);
         failureRateEl.removeEventListener('change', this.changeEdgeData);
         repairRateEl.removeEventListener('change', this.changeEdgeData);
+
+        linkLengthEl.removeEventListener('change', this.changeEdgeData);
 
         failureRateEl.value = edgeData.failureRate || 0;
         repairRateEl.value = edgeData.repairRate || 0;
@@ -201,6 +204,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
 
         failureRateEl.addEventListener('change', this.changeEdgeData.bind(this));
         repairRateEl.addEventListener('change', this.changeEdgeData.bind(this));
+        linkLengthEl.addEventListener('change', this.changeEdgeData.bind(this));
 
     };
 
@@ -277,6 +281,8 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         d3.event.stopPropagation();
         state.mouseDownLink = d;
 
+        thisGraph.disableLinkLength(false);
+
         if (state.selectedNode) {
             thisGraph.removeSelectFromNode();
         }
@@ -352,6 +358,14 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         return d3txt;
     };
 
+    GraphCreator.prototype.disableLinkLength = function (shouldDisable) {
+        var el = document.getElementById('linkLength');
+        if (shouldDisable)
+            el.setAttribute('disabled', 'disabled');
+        else
+            el.removeAttribute('disabled');
+    }
+
     // mouseup on nodes
     GraphCreator.prototype.circleMouseUp = function (d3node, d) {
         var thisGraph = this,
@@ -366,6 +380,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         if (!mouseDownNode) return;
 
         thisGraph.dragLine.classed("hidden", true);
+        thisGraph.disableLinkLength(true);
 
         if (mouseDownNode !== d) {
             // we're in a different node: create new edge for mousedown edge and add to graph
@@ -613,7 +628,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         tableBody.innerHTML = ''
 
         var edgesHTML = edges.map(function (edge) {
-            return `<tr><td>${edge.source.title} - ${edge.target.title}</td><td>${edge.failureRate || 0}</td><td>${edge.repairRate || 0}</td></tr>`;
+            return `<tr><td>${edge.source.title} - ${edge.target.title}</td><td>${edge.failureRate || 0}</td><td>${edge.repairRate || 0}</td><td>${edge.linkLength || 0}</td></tr>`;
         }).join('');
 
         tableBody.innerHTML = edgesHTML;
@@ -638,7 +653,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
     // initial node data
     var nodes = [{ title: "Č1", id: 0, x: xLoc, y: yLoc, repairRate: 0, failureRate: 0 },
     { title: "Č2", id: 1, x: xLoc, y: yLoc + 200, repairRate: 0, failureRate: 0 }];
-    var edges = [{ source: nodes[1], target: nodes[0], leng: 10 }];
+    var edges = [{ source: nodes[1], target: nodes[0], linkLength: 10 }];
 
 
     /** MAIN SVG **/

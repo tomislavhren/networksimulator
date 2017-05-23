@@ -134,7 +134,7 @@ path.link.selected {
     position: fixed;
     bottom: 2%;
     right: 2%;
-    width: 200px;
+    width: 250px;
 }
 
 #dashboard *:first-child {
@@ -167,5 +167,5 @@ path.link.selected {
     position: fixed;
     top: 2%;
     right: 2%;
-    width: 200px;
+    width: 250px;
 }
