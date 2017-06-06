@@ -1,4 +1,6 @@
-
+$.ajaxSetup({
+    headers: { "Content-Type": "application/json" }
+});
 document.onload = (function (d3, saveAs, Blob, undefined) {
     "use strict";
 
@@ -21,6 +23,8 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
             shiftNodeDrag: false,
             selectedText: null
         };
+
+        thisGraph.labelOffset = 15;
 
         // define arrow markers for graph links
         var defs = svg.append('svg:defs');
@@ -82,6 +86,8 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         svg.on("mousedown", function (d) { thisGraph.svgMouseDown.call(thisGraph, d); });
         svg.on("mouseup", function (d) { thisGraph.svgMouseUp.call(thisGraph, d); });
 
+        window.abc = this.getAllPaths.bind(this);
+
         // listen for dragging
         var dragSvg = d3.behavior.zoom()
             .on("zoom", function () {
@@ -109,11 +115,33 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         // listen for resize
         window.onresize = function () { thisGraph.updateWindow(svg); };
 
+        // controls
+        d3.select("#ep-method").on("change", thisGraph.changeEPMethod.bind(this))
+
         // handle delete graph
         d3.select("#delete-graph").on("click", function () {
             thisGraph.deleteGraph(false);
         });
+
+        thisGraph.updateEdgesList();
+        thisGraph.updateNodesList();
     };
+
+    GraphCreator.prototype.changeEPMethod = function () {
+        const methodId = parseInt($("#ep-method").val());
+        switch (methodId) {
+            case 1:
+                $("#primaryPath, #secondaryPath").attr("disabled", "disabled");
+                $(".hide-if-dijkstra").hide('fast');
+                break;
+            case 2:
+                $("#primaryPath, #secondaryPath").removeAttr("disabled");
+                $(".hide-if-dijkstra").show('fast');
+                break;
+            default:
+                break;
+        }
+    }
 
     GraphCreator.prototype.setIdCt = function (idct) {
         this.idct = idct;
@@ -218,6 +246,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
             }
         });
 
+        thisGraph.updateEdgeLabels();
         thisGraph.updateEdgesList();
     }
 
@@ -269,9 +298,14 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
 
     GraphCreator.prototype.removeSelectFromEdge = function () {
         var thisGraph = this;
-        thisGraph.paths.filter(function (cd) {
-            return cd === thisGraph.state.selectedEdge;
-        }).classed(thisGraph.consts.selectedClass, false);
+        thisGraph
+            .paths
+            .filter(function (cd) {
+                return cd === thisGraph.state.selectedEdge;
+            })
+            .select("path")
+            .classed(thisGraph.consts.selectedClass, false);
+
         thisGraph.state.selectedEdge = null;
     };
 
@@ -293,6 +327,8 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         } else {
             thisGraph.removeSelectFromEdge();
         }
+
+        $("#linkLength").val(d.linkLength || 0);
     };
 
     // mousedown on node
@@ -359,11 +395,14 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
     };
 
     GraphCreator.prototype.disableLinkLength = function (shouldDisable) {
-        var el = document.getElementById('linkLength');
-        if (shouldDisable)
-            el.setAttribute('disabled', 'disabled');
-        else
-            el.removeAttribute('disabled');
+        var el = $("#linkLength");
+        if (shouldDisable) {
+            el.attr('disabled', 'disabled');
+            el.val(null);
+        }
+        else {
+            el.removeAttr('disabled');
+        }
     }
 
     // mouseup on nodes
@@ -384,7 +423,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
 
         if (mouseDownNode !== d) {
             // we're in a different node: create new edge for mousedown edge and add to graph
-            var newEdge = { source: mouseDownNode, target: d };
+            var newEdge = { source: mouseDownNode, target: d, linkLength: 1, repairRate: 0, failureRate: 0 };
             var filtRes = thisGraph.paths.filter(function (d) {
                 if (d.source === newEdge.target && d.target === newEdge.source) {
                     thisGraph.edges.splice(thisGraph.edges.indexOf(d), 1);
@@ -395,7 +434,6 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
                 thisGraph.edges.push(newEdge);
                 console.log('%c New EDGE created', 'color: yellow');
                 console.log(newEdge);
-                console.log(thisGraph.edges);
                 console.log('%c ==============', 'color: yellow');
                 // thisGraph.updateEdgesList();
                 thisGraph.updateGraph();
@@ -414,16 +452,11 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
                     thisGraph.selectElementContents(txtNode);
                     txtNode.focus();
                 } else {
-                    if (state.selectedEdge) {
-                        thisGraph.removeSelectFromEdge();
-                    }
+                    if (state.selectedEdge) thisGraph.removeSelectFromEdge();
                     var prevNode = state.selectedNode;
 
-                    if (!prevNode || prevNode.id !== d.id) {
-                        thisGraph.replaceSelectNode(d3node, d);
-                    } else {
-                        thisGraph.removeSelectFromNode();
-                    }
+                    if (!prevNode || prevNode.id !== d.id) thisGraph.replaceSelectNode(d3node, d);
+                    else thisGraph.removeSelectFromNode();
                 }
             }
         }
@@ -431,6 +464,14 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         return;
 
     }; // end of circles mouseup
+
+    GraphCreator.prototype.updateEdgeLabels = function () {
+        var thisGraph = this;
+        var paths = thisGraph.paths;
+        paths
+            .selectAll("text")
+            .text(function (d) { return d.linkLength });
+    };
 
     // mousedown on main svg
     GraphCreator.prototype.svgMouseDown = function () {
@@ -515,7 +556,10 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         });
         var paths = thisGraph.paths;
         // update existing paths
-        paths.style('marker-end', 'url(#end-arrow)')
+        var paths = thisGraph.paths;
+        paths
+            .select("path")
+            .style('marker-end', 'url(#end-arrow)')
             .classed(consts.selectedClass, function (d) {
                 return d === state.selectedEdge;
             })
@@ -523,9 +567,15 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
                 return "M" + d.source.x + "," + d.source.y + "L" + d.target.x + "," + d.target.y;
             });
 
-        // add new paths
-        paths.enter()
-            .append("path")
+        paths
+            .select("text")
+            .attr("dx", function (d) { return d.source.x + thisGraph.labelOffset + (d.target.x - d.source.x) * 0.5 })
+            .attr("dy", function (d) { return d.source.y + (d.target.y - d.source.y) * 0.5 });
+
+        var group = paths.enter()
+            .append("g");
+
+        group.append("path")
             .style('marker-end', 'url(#end-arrow)')
             .classed("link", true)
             .attr("d", function (d) {
@@ -537,6 +587,16 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
             .on("mouseup", function (d) {
                 state.mouseDownLink = null;
             });
+
+        group.append("text")
+            .style({
+                'font-weight': '500',
+                'fill': 'white'
+            })
+            .attr("dx", function (d) { return d.source.x + thisGraph.labelOffset + (d.target.x - d.source.x) * 0.5 })
+            .attr("dy", function (d) { return d.source.y + (d.target.y - d.source.y) * 0.5 })
+            .text(function (d) { return d.linkLength });
+
 
         // remove old links
         paths.exit().remove();
@@ -566,9 +626,6 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
                 thisGraph.circleMouseUp.call(thisGraph, d3.select(this), d);
             })
             .call(thisGraph.drag);
-
-        // newGs.append("circle")
-        //     .attr("r", String(consts.nodeRadius));
 
         newGs.append("ellipse")
             .attr("id", "ellipse")
@@ -634,6 +691,32 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         tableBody.innerHTML = edgesHTML;
     }
 
+    GraphCreator.prototype.getAllPaths = function (start, end) {
+        var thisGraph = this;
+        var network = thisGraph.edges.reduce(function (prev, curr) {
+            if (!prev[curr.source.title]) prev[curr.source.title] = {};
+            prev[curr.source.title][curr.target.title] = curr.linkLength;
+
+            return prev;
+        }, {});
+
+        thisGraph
+            .nodes
+            .forEach(function (node) {
+                if (!network.hasOwnProperty(node.title)) network[node.title] = {};
+            });
+
+        const data = {
+            start: start,
+            end: end,
+            network: network
+        };
+
+        $.post('/dijkstra', JSON.stringify(data), function (res) {
+            console.log(res);
+        });
+    }
+
     /**** MAIN ****/
 
     // warn the user when leaving
@@ -653,7 +736,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
     // initial node data
     var nodes = [{ title: "Č1", id: 0, x: xLoc, y: yLoc, repairRate: 0, failureRate: 0 },
     { title: "Č2", id: 1, x: xLoc, y: yLoc + 200, repairRate: 0, failureRate: 0 }];
-    var edges = [{ source: nodes[1], target: nodes[0], linkLength: 10 }];
+    var edges = [{ source: nodes[1], target: nodes[0], linkLength: 1, repairRate: 0, failureRate: 0 }];
 
 
     /** MAIN SVG **/

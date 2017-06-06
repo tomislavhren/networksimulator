@@ -3,13 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="index.css" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
         crossorigin="anonymous">
+    <link rel="stylesheet" href="index.css" />
+    <title>PTM Labos</title>
 </head>
 
 <body>
-
 
     <ul id="legenda">
         <li>SHIFT + klik = novi čvor</li>
@@ -21,16 +21,16 @@
     <div id="dashboard">
         <h3>PARAMETRI</h3>
         <div class="form-group">
-            <label for="failureRate">Intenzitet kvarova, &lambda;</label>
+            <label for="failureRate">Intenzitet kvarova, &lambda; (FIT)</label>
             <input class="form-control" type="number" id="failureRate">
         </div>
         <div class="form-group">
-            <label for="repairRate">Intenzitet popravka, &mu;</label>
+            <label for="repairRate">Intenzitet popravka, &mu; (FIT)</label>
             <input class="form-control" type="number" id="repairRate">
         </div>
         <div class="form-group">
-            <label for="linkLength">Duljina linka</label>
-            <input class="form-control" type="number" id="linkLength">
+            <label for="linkLength">Duljina linka (m)</label>
+            <input class="form-control" type="number" id="linkLength" disabled>
         </div>
     </div>
 
@@ -42,8 +42,8 @@
                 <thead>
                     <tr>
                         <th title="Naziv čvora">Ime</th>
-                        <th title="Intenzitet kvarova">&lambda;</th>
-                        <th title="Intenzitet popravaka">&mu;</th>
+                        <th title="Intenzitet kvarova">&lambda;, FIT</th>
+                        <th title="Intenzitet popravaka">&mu;, FIT</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,8 +59,8 @@
                 <thead>
                     <tr>
                         <th title="Naziv linka">Ime</th>
-                        <th title="Intenzitet kvarova">&lambda;</th>
-                        <th title="Intenzitet popravaka">&mu;</th>
+                        <th title="Intenzitet kvarova">&lambda;, FIT</th>
+                        <th title="Intenzitet popravaka">&mu;, FIT</th>
                         <th title="Duljina linka">L, m</th>
                     </tr>
                 </thead>
@@ -71,7 +71,77 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.js"></script>
+    <div id="controls">
+        <a class="play" href="#" data-toggle="modal" data-target="#nodechooser">
+            <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+        </a>
+        <a class="info" href="#" data-toggle="modal" data-target="#informations">
+            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div class="modal fade bs-example-modal-sm" id="nodechooser" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <!--<div class="form-group">
+                    <label for="start-node">Početni čvor</label>
+                    <select id="start-node" class="form-control">
+                        <option value="Č1">Č1</option>
+                        <option value="Č2">Č2</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="end-node">Krajnji čvor</label>
+                    <select id="end-node" class="form-control">
+                        <option value="Č1">Č1</option>
+                        <option value="Č2">Č2</option>
+                    </select>
+                </div>-->
+                <div class="form-group">
+                    <label for="ep-method">Metoda određivanja puta</label>
+                    <select id="ep-method" class="form-control">
+                        <option value="1">Dijkstra</option>
+                        <option value="2">Samostalni upis</option>
+                    </select>
+                </div>
+
+                <div class="hide-if-dijkstra">
+                    <hr>
+
+                    <p style="text-align:left">Zarezoom odvojite nazive čvorova kroz koje put prolazi, npr. Č1,Č2,Č3 za put Č1-Č2-Č3</p>
+
+                    <div class="form-group">
+                        <label for="secondaryPath">Primarni put</label>
+                        <input class="form-control" type="text" id="secondaryPath" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="secondaryPath">Rezervni put</label>
+                        <input class="form-control" type="text" id="secondaryPath" disabled>
+                    </div>
+
+                    <hr>
+                </div>
+
+                <div class="form-group">
+                    <label for="ep-method">Proračun na razini</label>
+                    <select id="ep-method" class="form-control">
+                        <option value="1">Para čvorova</option>
+                        <option value="2" disabled>Cijele mreže</option>
+                    </select>
+                </div>
+
+                <button id="run-evaluation" type="button" class="btn btn-primary">Izračunaj!</button>
+
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
     <script src="index.js"></script>
 </body>
 
