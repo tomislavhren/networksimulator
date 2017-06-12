@@ -116,8 +116,8 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         window.onresize = function () { thisGraph.updateWindow(svg); };
 
         // controls
-        d3.select("#ep-method").on("change", thisGraph.changeEPMethod.bind(this))
-
+        d3.select("#epMethod").on("change", thisGraph.changeEPMethod.bind(this))
+        d3.select("#runEvaluation").on("click", thisGraph.runEvaluation.bind(this));
         // handle delete graph
         d3.select("#delete-graph").on("click", function () {
             thisGraph.deleteGraph(false);
@@ -128,15 +128,15 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
     };
 
     GraphCreator.prototype.changeEPMethod = function () {
-        const methodId = parseInt($("#ep-method").val());
+        const methodId = parseInt($("#epMethod").val());
         switch (methodId) {
             case 1:
                 $("#primaryPath, #secondaryPath").attr("disabled", "disabled");
-                $(".hide-if-dijkstra").hide('fast');
+                $(".hide-if-dijkstra").hide();
                 break;
             case 2:
                 $("#primaryPath, #secondaryPath").removeAttr("disabled");
-                $(".hide-if-dijkstra").show('fast');
+                $(".hide-if-dijkstra").show();
                 break;
             default:
                 break;
@@ -388,8 +388,8 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
                 d.title = this.textContent;
                 thisGraph.insertTitleLinebreaks(d3node, d.title);
                 d3.select(this.parentElement).remove();
-
                 thisGraph.updateNodesList();
+                thisGraph.updateNodeSelect();
             });
         return d3txt;
     };
@@ -490,6 +490,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
             var xycoords = d3.mouse(thisGraph.svgG.node()),
                 d = { id: thisGraph.idct++, title: "Č", x: xycoords[0], y: xycoords[1], failureRate: 0, repairRate: 0 };
             thisGraph.nodes.push(d);
+            thisGraph.updateNodeSelect();
             console.log('%c New node created', 'color: lightgreen');
             console.log(d);
             console.log(thisGraph.nodes);
@@ -713,6 +714,74 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         };
 
         $.post('/dijkstra', JSON.stringify(data), function (res) {
+            console.log(res);
+        });
+    }
+
+    GraphCreator.prototype.updateNodeSelect = function (id) {
+        var nodes = this.nodes.sort(function (a, b) { return a.title > b.title; }).map(function (d) {
+            return "<option value='" + d.title + "'>" + d.title + "</option>";
+        }).join("");
+
+        $("#startNode").html(nodes);
+        $("#endNode").html(nodes);
+    }
+
+    GraphCreator.prototype.runEvaluation = function () {
+        $("#runEvaluation .text").hide();
+        $("#runEvaluation .loading-spinner").addClass("in");
+
+        var thisGraph = this;
+        var nodes = thisGraph.nodes;
+        var edges = thisGraph.edges;
+        var startNode = $("#startNode").val() || null;
+        var endNode = $("#endNode").val() || null;
+        var epMethod = $("#epMethod").val() || null;
+        var evaluationLevel = $("#evaluationLevel").val() || null;
+        var time = $("#time").val() || null;
+        var primaryPath = $("#primaryPath").val() || null;
+        primaryPath = primaryPath ? primaryPath.split(",").map(function (p) { return p.trim(); }) : null;
+        var secondaryPath = $("#secondaryPath").val() || null;
+        secondaryPath = secondaryPath ? secondaryPath.split(",").map(function (p) { return p.trim(); }) : null;
+        var network = thisGraph.edges.reduce(function (prev, curr) {
+            if (!prev[curr.source.title]) prev[curr.source.title] = {};
+            prev[curr.source.title][curr.target.title] = curr.linkLength;
+
+            return prev;
+        }, {});
+
+        thisGraph
+            .nodes
+            .forEach(function (node) {
+                if (!network.hasOwnProperty(node.title)) network[node.title] = {};
+            });
+
+        var data = {
+            start: startNode,
+            end: endNode,
+            method: epMethod,
+            evaluationLevel: evaluationLevel,
+            primaryPath: primaryPath,
+            secondaryPath: secondaryPath,
+            network: network,
+            nodes: nodes.slice().map(function (n) {
+                n['reliability'] = Math.exp(-(n.failureRate / Math.pow(10, 9)) * parseInt(time));
+                n['availability'] = n.repairRate / (n.repairRate + (n.failureRate / Math.pow(10, 9)));
+                return n;
+            }),
+            edges: edges.slice().map(function (e) {
+                e['stringId'] = e.source.title + e.target.title;
+                e['reliability'] = Math.exp(-(e.failureRate / Math.pow(10, 9)) * parseInt(time));
+                e['availability'] = e.repairRate / (e.repairRate + (e.failureRate / Math.pow(10, 9)));
+                return e;
+            })
+        };
+
+        $.post('/evaluation', JSON.stringify(data), function (res) {
+            setTimeout(function () {
+                $("#runEvaluation .text").show();
+                $("#runEvaluation .loading-spinner").removeClass("in");
+            }, 1500);
             console.log(res);
         });
     }

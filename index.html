@@ -25,7 +25,7 @@
             <input class="form-control" type="number" id="failureRate">
         </div>
         <div class="form-group">
-            <label for="repairRate">Intenzitet popravka, &mu; (FIT)</label>
+            <label for="repairRate">Intenzitet popravka, &mu; (h<sup>-1</sup>)</label>
             <input class="form-control" type="number" id="repairRate">
         </div>
         <div class="form-group">
@@ -43,7 +43,7 @@
                     <tr>
                         <th title="Naziv čvora">Ime</th>
                         <th title="Intenzitet kvarova">&lambda;, FIT</th>
-                        <th title="Intenzitet popravaka">&mu;, FIT</th>
+                        <th title="Intenzitet popravaka">&mu;, h<sup>-1</sup></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -60,7 +60,7 @@
                     <tr>
                         <th title="Naziv linka">Ime</th>
                         <th title="Intenzitet kvarova">&lambda;, FIT</th>
-                        <th title="Intenzitet popravaka">&mu;, FIT</th>
+                        <th title="Intenzitet popravaka">&mu;, h<sup>-1</sup></th>
                         <th title="Duljina linka">L, m</th>
                     </tr>
                 </thead>
@@ -83,23 +83,10 @@
     <div class="modal fade bs-example-modal-sm" id="nodechooser" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
         <div class="modal-dialog modal-sm" role="document">
             <div class="modal-content">
-                <!--<div class="form-group">
-                    <label for="start-node">Početni čvor</label>
-                    <select id="start-node" class="form-control">
-                        <option value="Č1">Č1</option>
-                        <option value="Č2">Č2</option>
-                    </select>
-                </div>
+
                 <div class="form-group">
-                    <label for="end-node">Krajnji čvor</label>
-                    <select id="end-node" class="form-control">
-                        <option value="Č1">Č1</option>
-                        <option value="Č2">Č2</option>
-                    </select>
-                </div>-->
-                <div class="form-group">
-                    <label for="ep-method">Metoda određivanja puta</label>
-                    <select id="ep-method" class="form-control">
+                    <label for="epMethod">Metoda određivanja puta</label>
+                    <select id="epMethod" class="form-control">
                         <option value="1">Dijkstra</option>
                         <option value="2">Samostalni upis</option>
                     </select>
@@ -111,8 +98,8 @@
                     <p style="text-align:left">Zarezoom odvojite nazive čvorova kroz koje put prolazi, npr. Č1,Č2,Č3 za put Č1-Č2-Č3</p>
 
                     <div class="form-group">
-                        <label for="secondaryPath">Primarni put</label>
-                        <input class="form-control" type="text" id="secondaryPath" disabled>
+                        <label for="primaryPath">Primarni put</label>
+                        <input class="form-control" type="text" id="primaryPath" disabled>
                     </div>
                     <div class="form-group">
                         <label for="secondaryPath">Rezervni put</label>
@@ -123,15 +110,45 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="ep-method">Proračun na razini</label>
-                    <select id="ep-method" class="form-control">
+                    <label for="evaluationLevel">Proračun na razini</label>
+                    <select id="evaluationLevel" class="form-control">
                         <option value="1">Para čvorova</option>
                         <option value="2" disabled>Cijele mreže</option>
                     </select>
                 </div>
 
-                <button id="run-evaluation" type="button" class="btn btn-primary">Izračunaj!</button>
+                <div class="form-group">
+                    <label for="startNode">Početni čvor</label>
+                    <select id="startNode" class="form-control">
+                        <option value="Č1">Č1</option>
+                        <option value="Č2">Č2</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="endNode">Krajnji čvor</label>
+                    <select id="endNode" class="form-control">
+                        <option value="Č1">Č1</option>
+                        <option value="Č2">Č2</option>
+                    </select>
+                </div>
 
+                <hr>
+
+                <div class="form-group">
+                    <label for="time">Vremenski interval (u satima)</label>
+                    <input class="form-control" type="number" id="time">
+                </div>
+
+                <button id="runEvaluation" type="button" class="btn btn-primary">
+                    <span class="text">Izračunaj!</span>
+                    <span class="loading-spinner">
+                        <div class="dots">
+                            <i class="spinner__dot spinner__dot--one"></i>
+                            <i class="spinner__dot spinner__dot--two"></i>
+                            <i class="spinner__dot spinner__dot--three"></i>
+                        </div>
+                    </span>
+                </button>
 
             </div>
         </div>

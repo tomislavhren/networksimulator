@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var dijkstra = require('./djikstra.js');
+var abraham = require('./abraham');
 
 // set the port of our application
 // process.env.PORT lets the port be set by Heroku
@@ -29,6 +30,64 @@ app.post('/dijkstra', function (req, res) {
     }
 });
 
+app.post('/evaluation', function (req, res) {
+    const edges = req.body
+        .edges
+        .map(function (p) {
+            p["isIncludedInPath"] = null;
+            p["sourceTitle"] = p.source.title;
+            p["targetTitle"] = p.target.title;
+            return p;
+        });
+
+    let primaryPath = [];
+    let secondaryPath = [];
+    switch (req.body.method) {
+        case "2": // voluntary choosen path
+            primaryPath = req.body.primaryPath;
+            secondaryPath = req.body.secondaryPath;
+            break;
+        case "1": // dijkstra algorithm paths
+            var dijkstraPaths = dijkstra(req.body.start, req.body.end, req.body.network);
+            primaryPath = dijkstraPaths[0].path;
+            secondaryPath = dijkstraPaths[1].path;
+            break;
+    }
+
+    const disjointProducts = abraham(req.body.nodes, edges, primaryPath, secondaryPath);
+    let reliabilityBetweenNodes = 0;
+    let availabilityBetweenNodes = 0;
+    disjointProducts.forEach(function (product) {
+        let productReliability = 1;
+        let productAvailability = 1;
+        product.forEach(function (edge) {
+            switch (edge.isIncludedInPath) {
+                case true:
+                    productReliability *= edge.reliability;
+                    productAvailability *= edge.availability;
+                    break;
+                case false:
+                    productReliability *= 1 - edge.reliability;
+                    productAvailability *= 1 - edge.availability;
+                    break;
+                default:
+                    break;
+            }
+        });
+        reliabilityBetweenNodes += productReliability;
+        availabilityBetweenNodes += productAvailability;
+    });
+
+    res.status(200).json({
+        availabilty: availabilityBetweenNodes,
+        reliability: reliabilityBetweenNodes,
+        start: req.body.start,
+        end: req.body.end,
+        primaryPath: primaryPath,
+        secondaryPath: secondaryPath
+    });
+});
+
 app.listen(port, function () {
-    console.log('Our app is running on http://localhost:' + port);
+    console.log('Our app is running on PORT ' + port);
 });
