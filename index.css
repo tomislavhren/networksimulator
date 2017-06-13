@@ -301,3 +301,18 @@
             transform: scale(1);
         }
     }
+
+    .modal-content h3,
+    .modal-content h5 {
+        text-align: left;
+        margin: 2px 0 6px 0 !important;
+        font-weight: 400;
+    }
+
+    .modal-content h5 {
+        font-weight: 600;
+    }
+
+    #evaluationresults .modal-content {
+        padding: 16px;
+    }

@@ -1,6 +1,7 @@
 $.ajaxSetup({
     headers: { "Content-Type": "application/json" }
 });
+
 document.onload = (function (d3, saveAs, Blob, undefined) {
     "use strict";
 
@@ -86,8 +87,6 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         svg.on("mousedown", function (d) { thisGraph.svgMouseDown.call(thisGraph, d); });
         svg.on("mouseup", function (d) { thisGraph.svgMouseUp.call(thisGraph, d); });
 
-        window.abc = this.getAllPaths.bind(this);
-
         // listen for dragging
         var dragSvg = d3.behavior.zoom()
             .on("zoom", function () {
@@ -118,14 +117,66 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         // controls
         d3.select("#epMethod").on("change", thisGraph.changeEPMethod.bind(this))
         d3.select("#runEvaluation").on("click", thisGraph.runEvaluation.bind(this));
-        // handle delete graph
-        d3.select("#delete-graph").on("click", function () {
-            thisGraph.deleteGraph(false);
+        d3.select("#export").on("click", thisGraph.exportGraphAsJSON.bind(this));
+        document.getElementById("importfile").onchange = function (event) {
+            thisGraph.importGraphFromFile.call(thisGraph, this, event);
+        };
+        d3.select("#import").on("click", function () {
+            $("#importfile").click();
         });
 
         thisGraph.updateEdgesList();
         thisGraph.updateNodesList();
     };
+
+    GraphCreator.prototype.exportGraphAsJSON = function () {
+        var thisGraph = this;
+
+        var data = {
+            nodes: thisGraph.nodes,
+            edges: thisGraph.edges,
+            state: thisGraph.state,
+            idct: thisGraph.idct,
+            circles: thisGraph.circles,
+            paths: thisGraph.paths
+        };
+
+        var a = document.getElementById("export");
+        var file = new Blob([JSON.stringify(data)], { type: 'application/json' });
+        a.href = URL.createObjectURL(file);
+        a.download = 'graph.json';
+    }
+
+    GraphCreator.prototype.importGraphFromFile = function (context, data) {
+        var thisGraph = this;
+        var file = context.files[0];
+        if (!file) return;
+
+        var fileReader = new FileReader();
+        fileReader.onload = function (e) {
+            var data = JSON.parse(e.target.result);
+
+            thisGraph.state = data.state;
+            thisGraph.nodes = data.nodes.slice();
+            thisGraph.edges = data.edges.slice().map(function (e) {
+                var sourceNode = thisGraph.nodes.filter(function (n) {
+                    return n.title == e.source.title;
+                })[0];
+                var targetNode = thisGraph.nodes.filter(function (n) {
+                    return n.title == e.target.title;
+                })[0];
+
+                e.source = sourceNode;
+                e.target = targetNode;
+
+                return e;
+            });
+            thisGraph.setIdCt(data.idct);
+            thisGraph.updateGraph();
+        };
+
+        fileReader.readAsText(context.files[0]);
+    }
 
     GraphCreator.prototype.changeEPMethod = function () {
         const methodId = parseInt($("#epMethod").val());
@@ -280,7 +331,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         var selectedNode = thisGraph.state.selectedNode;
         var id = e.target.getAttribute('id');
         this.nodes.forEach(function (node) {
-            if (node.id == selectedNode.id) {
+            if (selectedNode && node.id == selectedNode.id) {
                 node[id] = parseFloat(e.target.value);
             }
         });
@@ -555,7 +606,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         thisGraph.paths = thisGraph.paths.data(thisGraph.edges, function (d) {
             return String(d.source.id) + "+" + String(d.target.id);
         });
-        var paths = thisGraph.paths;
+
         // update existing paths
         var paths = thisGraph.paths;
         paths
@@ -631,15 +682,12 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         newGs.append("ellipse")
             .attr("id", "ellipse")
             .attr("style", "fill:#F39C12")
-            // .attr("cx", "365.832")
-            // .attr("cy", "265.546")
             .attr("rx", "34.048")
             .attr("ry", "30.113");
 
         newGs.append("ellipse")
             .attr("id", "ellipse-shadow")
             .attr("style", "fill:#F1C40F")
-            // .attr("cx", "365.832")
             .attr("cy", "-3")
             .attr("rx", "34.048")
             .attr("ry", "28.282");
@@ -650,6 +698,11 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
 
         // remove old nodes
         thisGraph.circles.exit().remove();
+
+        this.updateEdgeLabels();
+        this.updateEdgesList();
+        this.updateNodeSelect();
+        this.updateNodesList();
     };
 
     GraphCreator.prototype.zoomed = function () {
@@ -781,17 +834,41 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
             setTimeout(function () {
                 $("#runEvaluation .text").show();
                 $("#runEvaluation .loading-spinner").removeClass("in");
+                $("#nodechooser").modal("hide");
+                thisGraph.showEvaluationResult(res);
             }, 1500);
-            console.log(res);
         });
     }
 
-    /**** MAIN ****/
+    GraphCreator.prototype.showEvaluationResult = function (data) {
+        const result = `
+            <div>
+                <br/>
+                <h3>Pouzdanost između čvorova ${data.start} i ${data.end}</h3>
+                <h2>${data.reliability}</h2>
+                <hr/>
+            </div>
+            <div>
+                <h3>Raspoloživost između čvorova ${data.start} i ${data.end}</h3>
+                <h2>${data.availabilty}</h2>
+                <hr/>
+            </div>
+            <div>
+                <h3>Primarni put</h3>
+                <h2>${data.primaryPath.join("&rarr;")}</h2>
+                <hr/>
+            </div>
+            <div>
+                <h3>Rezervni put</h3>
+                <h2>${data.secondaryPath.join("&rarr;")}</h2>
+                <br/>
+            </div>
+        `;
+        $("#evaluationresults .modal-content").html(result);
+        $("#evaluationresults").modal("show");
+    }
 
-    // warn the user when leaving
-    window.onbeforeunload = function () {
-        return "Make sure to save your graph locally before leaving :-)";
-    };
+    /**** MAIN ****/
 
     var docEl = document.documentElement,
         bodyEl = document.getElementsByTagName('body')[0];
@@ -807,7 +884,6 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
     { title: "Č2", id: 1, x: xLoc, y: yLoc + 200, repairRate: 0, failureRate: 0 }];
     var edges = [{ source: nodes[1], target: nodes[0], linkLength: 1, repairRate: 0, failureRate: 0 }];
 
-
     /** MAIN SVG **/
     var svg = d3.select("body").append("svg")
         .attr("width", '100%')
@@ -815,4 +891,6 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
     var graph = new GraphCreator(svg, nodes, edges);
     graph.setIdCt(2);
     graph.updateGraph();
+
+    window.GraphCreator = GraphCreator;
 })(window.d3, window.saveAs, window.Blob);
