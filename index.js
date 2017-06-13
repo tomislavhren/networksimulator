@@ -891,6 +891,5 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
     var graph = new GraphCreator(svg, nodes, edges);
     graph.setIdCt(2);
     graph.updateGraph();
-
-    window.GraphCreator = GraphCreator;
+    $('[data-toggle="tooltip"]').tooltip();
 })(window.d3, window.saveAs, window.Blob);
