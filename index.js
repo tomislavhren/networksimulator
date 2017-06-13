@@ -118,6 +118,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         d3.select("#epMethod").on("change", thisGraph.changeEPMethod.bind(this))
         d3.select("#runEvaluation").on("click", thisGraph.runEvaluation.bind(this));
         d3.select("#export").on("click", thisGraph.exportGraphAsJSON.bind(this));
+        d3.select("#exportresults").on("click", thisGraph.exportResultsAsText.bind(this));
         document.getElementById("importfile").onchange = function (event) {
             thisGraph.importGraphFromFile.call(thisGraph, this, event);
         };
@@ -145,6 +146,28 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         var file = new Blob([JSON.stringify(data)], { type: 'application/json' });
         a.href = URL.createObjectURL(file);
         a.download = 'graph.json';
+    }
+
+    GraphCreator.prototype.exportResultsAsText = function () {
+        var thisGraph = this;
+
+        var network = thisGraph.edges.reduce(function (prev, curr) {
+            if (!prev[curr.source.title]) prev[curr.source.title] = {};
+            prev[curr.source.title][curr.target.title] = curr.linkLength;
+
+            return prev;
+        }, {});
+        
+        var data = Object.keys(network).map(function (d) { return d + "->" + Object.keys(network[d]).join('->'); }).join("\n");
+        data += "\n";
+        data += "Pouzdanost: " + $(".result-reliability h3").text() + "\n";
+        data += "Raspoloživost: " + $(".result-availability h3").text() + "\n";
+        data += "Primarni put: " + $(".result-primarypath h3").text() + "\n";
+        data += "Rezervni put: " + $(".result-secondarypath h3").text() + "\n";
+        var a = document.getElementById("exportresults");
+        var file = new Blob([data.replace(/\n/g, "\r\n")], { type: 'text/plain' });
+        a.href = URL.createObjectURL(file);
+        a.download = 'results.txt';
     }
 
     GraphCreator.prototype.importGraphFromFile = function (context, data) {
@@ -726,7 +749,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         tableBody.innerHTML = ''
 
         var nodesHTML = nodes.map(function (node) {
-            return `<tr><td>${node.title}</td><td>${node.failureRate}</td><td>${node.repairRate}</td></tr>`;
+            return `< tr > <td>${node.title}</td> <td>${node.failureRate}</td> <td>${node.repairRate}</td></tr > `;
         }).join('');
 
         tableBody.innerHTML = nodesHTML;
@@ -739,7 +762,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         tableBody.innerHTML = ''
 
         var edgesHTML = edges.map(function (edge) {
-            return `<tr><td>${edge.source.title} - ${edge.target.title}</td><td>${edge.failureRate || 0}</td><td>${edge.repairRate || 0}</td><td>${edge.linkLength || 0}</td></tr>`;
+            return `< tr > <td>${edge.source.title} - ${edge.target.title}</td> <td>${edge.failureRate || 0}</td> <td>${edge.repairRate || 0}</td> <td>${edge.linkLength || 0}</td></tr > `;
         }).join('');
 
         tableBody.innerHTML = edgesHTML;
@@ -842,29 +865,29 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
 
     GraphCreator.prototype.showEvaluationResult = function (data) {
         const result = `
-            <div>
-                <br/>
-                <h3>Pouzdanost između čvorova ${data.start} i ${data.end}</h3>
-                <h2>${data.reliability}</h2>
-                <hr/>
-            </div>
-            <div>
-                <h3>Raspoloživost između čvorova ${data.start} i ${data.end}</h3>
-                <h2>${data.availabilty}</h2>
-                <hr/>
-            </div>
-            <div>
-                <h3>Primarni put</h3>
-                <h2>${data.primaryPath.join("&rarr;")}</h2>
-                <hr/>
-            </div>
-            <div>
-                <h3>Rezervni put</h3>
-                <h2>${data.secondaryPath.join("&rarr;")}</h2>
-                <br/>
-            </div>
+        <div class="result-reliability">
+            <br />
+            <h3>Pouzdanost između čvorova ${data.start} i ${data.end}</h3>
+            <h2>${data.reliability}</h2>
+            <hr />
+        </div>
+        <div class="result-availability">
+            <h3>Raspoloživost između čvorova ${data.start} i ${data.end}</h3>
+            <h2>${data.availabilty}</h2>
+            <hr />
+        </div>
+        <div class="result-primarypath">
+            <h3>Primarni put</h3>
+            <h2>${data.primaryPath.join("&rarr;")}</h2>
+            <hr />
+        </div>
+        <div class="result-secondarypath">
+            <h3>Rezervni put</h3>
+            <h2>${data.secondaryPath.join("&rarr;")}</h2>
+            <br />
+        </div>
         `;
-        $("#evaluationresults .modal-content").html(result);
+        $("#evaluationresults .modal-content .content").html(result);
         $("#evaluationresults").modal("show");
     }
 

@@ -316,3 +316,11 @@
     #evaluationresults .modal-content {
         padding: 16px;
     }
+
+    #evaluationresults .modal-content h3 {
+        font-size: 15px !important;
+    }
+
+       #evaluationresults .modal-content h2 {
+        font-size: 20px !important;
+    }
