@@ -9,6 +9,12 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
     var greeting = time >= 20 && time < 5 ? "Dobro večer!" : ((time >= 5 && time < 12) ? "Dobro jutro!" : "Dobar dan!");
     $(".greeting").text(greeting);
 
+    if (!localStorage.getItem('is_user_first_time'))
+        setTimeout(function () {
+            $("#informations").modal('show');
+            localStorage.setItem('is_user_first_time', true);
+        }, 1200)
+
     // define graphcreator object
     var GraphCreator = function (svg, nodes, edges) {
         var thisGraph = this;
