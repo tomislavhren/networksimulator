@@ -7,7 +7,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
 
     var time = new Date().getHours();
     var greeting = time >= 20 && time < 5 ? "Dobro večer!" : ((time >= 5 && time < 12) ? "Dobro jutro!" : "Dobar dan!");
-    $(".greeting").text(greeting);    
+    $(".greeting").text(greeting);
 
     // define graphcreator object
     var GraphCreator = function (svg, nodes, edges) {
@@ -161,13 +161,13 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
 
             return prev;
         }, {});
-        
-        var data = Object.keys(network).map(function (d) { return d + "->" + Object.keys(network[d]).join('->'); }).join("\n");
+
+        var data = Object.keys(network).map(function (d) { return d + "->" + Object.keys(network[d]).map(function (key) { return key + '(' + network[d][key] + ')' }).join(', '); }).join("\n");
         data += "\n";
-        data += "Pouzdanost: " + $(".result-reliability h3").text() + "\n";
-        data += "Raspoloživost: " + $(".result-availability h3").text() + "\n";
-        data += "Primarni put: " + $(".result-primarypath h3").text() + "\n";
-        data += "Rezervni put: " + $(".result-secondarypath h3").text() + "\n";
+        data += "Pouzdanost: " + $(".result-reliability h2").text() + "\n";
+        data += "Raspoloživost: " + $(".result-availability h2").text() + "\n";
+        data += "Primarni put: " + $(".result-primarypath h2").text() + "\n";
+        data += "Rezervni put: " + $(".result-secondarypath h2").text() + "\n";
         var a = document.getElementById("exportresults");
         var file = new Blob([data.replace(/\n/g, "\r\n")], { type: 'text/plain' });
         a.href = URL.createObjectURL(file);
