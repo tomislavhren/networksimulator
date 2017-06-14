@@ -38,7 +38,15 @@ function Dijkstra(start, end, network) {
         return sum;
     }
 
-    return result;
+    const primary = result[0];
+    let temp = result[0].path.slice();
+    temp.pop();
+    temp.shift();
+    const secondary = result.find((d) => {
+        return !d.path.some(n => temp.indexOf(n) > -1);
+    });
+
+    return [primary, secondary];
 }
 
 module.exports = Dijkstra;
