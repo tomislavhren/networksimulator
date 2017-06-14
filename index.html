@@ -21,7 +21,7 @@
     <div id="dashboard">
         <h3>PARAMETRI</h3>
         <div class="form-group">
-            <label for="failureRate">Intenzitet kvarova, &lambda; (FIT)</label>
+            <label for="failureRate">Intenzitet kvarova, &lambda; (FIT/km)</label>
             <input class="form-control input-sm" type="number" id="failureRate">
         </div>
         <div class="form-group">
@@ -29,7 +29,7 @@
             <input class="form-control input-sm" type="number" id="repairRate">
         </div>
         <div class="form-group">
-            <label for="linkLength">Duljina linka (m)</label>
+            <label for="linkLength">Duljina linka (km)</label>
             <input class="form-control input-sm" type="number" id="linkLength" disabled>
         </div>
     </div>
@@ -42,7 +42,7 @@
                 <thead>
                     <tr>
                         <th title="Naziv čvora">Ime</th>
-                        <th title="Intenzitet kvarova">&lambda;, FIT</th>
+                        <th title="Intenzitet kvarova">&lambda;, FIT/km</th>
                         <th title="Intenzitet popravaka">&mu;, h<sup>-1</sup></th>
                     </tr>
                 </thead>
@@ -59,9 +59,9 @@
                 <thead>
                     <tr>
                         <th title="Naziv linka">Ime</th>
-                        <th title="Intenzitet kvarova">&lambda;, FIT</th>
+                        <th title="Intenzitet kvarova">&lambda;, FIT/km</th>
                         <th title="Intenzitet popravaka">&mu;, h<sup>-1</sup></th>
-                        <th title="Duljina linka">L, m</th>
+                        <th title="Duljina linka">L, km</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,6 +70,7 @@
             </table>
         </div>
     </div>
+
     <div id="controls">
         <a class="play" href="#" data-toggle="modal" data-target="#nodechooser">
             <span data-toggle="tooltip" title="Pokretanje simulacije" class="glyphicon glyphicon-play" aria-hidden="true"></span>

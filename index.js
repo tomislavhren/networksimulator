@@ -858,8 +858,8 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
             }),
             edges: edges.slice().map(function (e) {
                 e['stringId'] = e.source.title + e.target.title;
-                e['reliability'] = Math.exp(-(e.failureRate / Math.pow(10, 9)) * parseInt(time));
-                e['availability'] = e.repairRate / (e.repairRate + (e.failureRate / Math.pow(10, 9)));
+                e['reliability'] = Math.exp((-(e.failureRate / Math.pow(10, 9)) * e.linkLength) * parseInt(time));
+                e['availability'] = e.repairRate / (e.repairRate + ((e.failureRate * n.linkLength) / Math.pow(10, 9)));
                 return e;
             })
         };
