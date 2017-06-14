@@ -191,8 +191,27 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
             var data = JSON.parse(e.target.result);
 
             thisGraph.state = data.state;
-            thisGraph.nodes = data.nodes.slice();
-            thisGraph.edges = data.edges.slice().map(function (e) {
+
+            for (var i = 0; i <= thisGraph.nodes.length; i++)
+                thisGraph.nodes.pop();
+            for (var i = 0; i <= thisGraph.edges.length; i++)
+                thisGraph.edges.pop();
+
+            thisGraph.updateGraph();
+            data.nodes.forEach(function (node) {
+                thisGraph.nodes.push({
+                    "title": node.title,
+                    "id": node.id,
+                    "x": node.x,
+                    "y": node.y,
+                    "repairRate": node.repairRate,
+                    "failureRate": node.failureRate,
+                    "reliability": node.reliability,
+                    "availability": node.availability
+                });
+            });
+
+            var edgesTemp = data.edges.slice().map(function (e) {
                 var sourceNode = thisGraph.nodes.filter(function (n) {
                     return n.title == e.source.title;
                 })[0];
@@ -205,6 +224,11 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
 
                 return e;
             });
+
+            edgesTemp.forEach(function (edge) {
+                thisGraph.edges.push(edge);
+            });
+
             thisGraph.setIdCt(data.idct);
             thisGraph.updateGraph();
         };
@@ -558,6 +582,12 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
             .text(function (d) { return d.linkLength });
     };
 
+    GraphCreator.prototype.updateNodeLabels = function () {
+        var thisGraph = this;
+        var circles = thisGraph.circles;
+        circles.selectAll("text").text(function (d) { return d.title; })
+    }
+
     // mousedown on main svg
     GraphCreator.prototype.svgMouseDown = function () {
         this.state.graphMouseDown = true;
@@ -733,10 +763,9 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         // remove old nodes
         thisGraph.circles.exit().remove();
 
-        this.updateEdgeLabels();
-        this.updateEdgesList();
-        this.updateNodeSelect();
-        this.updateNodesList();
+        thisGraph.updateEdgeLabels();
+        thisGraph.updateNodeSelect();
+        thisGraph.updateNodeLabels();
     };
 
     GraphCreator.prototype.zoomed = function () {

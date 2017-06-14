@@ -28,6 +28,7 @@ function Abraham(nodes, edges, primaryPath, secondaryPath) {
 
     /**
      * x1*P, x1x2*P, x1x2x3*P.....
+     * ex. 12, 25
      */
     let forSwap = [];
     for (var i = 0; i < x.length; i++) {
@@ -51,16 +52,20 @@ function Abraham(nodes, edges, primaryPath, secondaryPath) {
         forSwap.push(newArrObj);
     }
 
-
     let result = [s1];
     forSwap.forEach(function (sw) {
-        const obj = s2.slice().map(function (d) {
-            d["isIncludedInPath"] = sw.hasOwnProperty(d.stringId) ? sw[d.stringId] : d.isIncludedInPath;
-            return d;
+        let obj = s2.slice().map(function(r) {
+            return {
+                stringId: r.stringId,
+                isIncludedInPath:  sw[r.stringId] != undefined ? sw[r.stringId] : r.isIncludedInPath,
+                reliability: r.reliability,
+                availability: r.availability
+            }
         });
 
         result.push(obj);
     });
+
 
     return result;
 

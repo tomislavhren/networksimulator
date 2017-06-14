@@ -55,6 +55,7 @@ app.post('/evaluation', function (req, res) {
     }
 
     const disjointProducts = abraham(req.body.nodes, edges, primaryPath, secondaryPath);
+
     let reliabilityBetweenNodes = 0;
     let availabilityBetweenNodes = 0;
     disjointProducts.forEach(function (product) {
