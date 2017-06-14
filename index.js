@@ -5,6 +5,10 @@ $.ajaxSetup({
 document.onload = (function (d3, saveAs, Blob, undefined) {
     "use strict";
 
+    var time = new Date().getHours();
+    var greeting = time >= 20 && time < 5 ? "Dobro večer!" : ((time >= 5 && time < 12) ? "Dobro jutro!" : "Dobar dan!");
+    $(".greeting").text(greeting);    
+
     // define graphcreator object
     var GraphCreator = function (svg, nodes, edges) {
         var thisGraph = this;
@@ -749,7 +753,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         tableBody.innerHTML = ''
 
         var nodesHTML = nodes.map(function (node) {
-            return `< tr > <td>${node.title}</td> <td>${node.failureRate}</td> <td>${node.repairRate}</td></tr > `;
+            return `<tr><td>${node.title}</td> <td>${node.failureRate}</td> <td>${node.repairRate}</td></tr>`;
         }).join('');
 
         tableBody.innerHTML = nodesHTML;
@@ -762,7 +766,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         tableBody.innerHTML = ''
 
         var edgesHTML = edges.map(function (edge) {
-            return `< tr > <td>${edge.source.title} - ${edge.target.title}</td> <td>${edge.failureRate || 0}</td> <td>${edge.repairRate || 0}</td> <td>${edge.linkLength || 0}</td></tr > `;
+            return `<tr><td>${edge.source.title} - ${edge.target.title}</td><td>${edge.failureRate || 0}</td><td>${edge.repairRate || 0}</td><td>${edge.linkLength || 0}</td></tr>`;
         }).join('');
 
         tableBody.innerHTML = edgesHTML;

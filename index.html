@@ -72,10 +72,10 @@
     </div>
     <div id="controls">
         <a class="play" href="#" data-toggle="modal" data-target="#nodechooser">
-            <span data-toggle="tooltip" title="Pokretanje simulacijce" class="glyphicon glyphicon-play" aria-hidden="true"></span>
+            <span data-toggle="tooltip" title="Pokretanje simulacije" class="glyphicon glyphicon-play" aria-hidden="true"></span>
         </a>
         <a class="results" href="#" data-toggle="modal" data-target="#evaluationresults">
-            <span data-toggle="tooltip" title="Rezultat simulacije" class="glyphicon glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+            <span data-toggle="tooltip" title="Rezultat simulacije" class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
         </a>
         <a class="export" href="#" id="export">
             <span data-toggle="tooltip" title="Export mreže" class="glyphicon glyphicon-export" aria-hidden="true"></span>
@@ -84,9 +84,9 @@
             <span data-toggle="tooltip" title="Import mreže" class="glyphicon glyphicon glyphicon-import" aria-hidden="true"></span>
             <input type="file" id="importfile" style="position: absolute;left:-9999999px;">
         </a>
-        <!--<a class="info" href="#" data-toggle="modal" data-target="#informations">
+        <a class="info" href="#" data-toggle="modal" data-target="#informations">
             <span data-toggle="tooltip" title="Pomoć" class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
-        </a>-->
+        </a>
     </div>
 
     <div class="modal fade bs-example-modal-sm" id="nodechooser" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
@@ -169,6 +169,54 @@
             <div class="modal-content">
                 <div class="content"></div>
                 <a class="btn btn-primary" href="#" id="exportresults">Preuzmi rezultate</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="informations" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="padding: 16px">
+                <h2 class="greeting" style="text-align: center"></h2>
+                <h3>Upute</h3>
+                <ul>
+                    <li>SHIFT + klik = novi čvor</li>
+                    <li>SHIFT + klik na čvor + povući do drugog čvora = spajanje čvora</li>
+                    <li>klik na čvor ili link + DELETE = brisanje čvora/linka</li>
+                    <li>SHIFT + klik na čvor = izmjena pouzdanosti/raspoloživosti čvora</li>
+                    <li>
+                        Tipka&nbsp;
+                        <span data-toggle="tooltip" title="Pokretanje simulacije" class="glyphicon glyphicon-play" aria-hidden="true"></span>&nbsp;
+                        pokretanje simulacije
+                    </li>
+                    <li>
+                        Tipka&nbsp;
+                        <span data-toggle="tooltip" title="Pokretanje simulacije" class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>&nbsp;
+                        pregled rezultata simulacije
+                    </li>
+                    <li>
+                        Tipka&nbsp;
+                        <span data-toggle="tooltip" title="Pokretanje simulacije" class="glyphicon glyphicon-export" aria-hidden="true"></span>&nbsp;
+                        export mreže kao JSON
+                    </li>
+                    <li>
+                        Tipka&nbsp;
+                        <span data-toggle="tooltip" title="Pokretanje simulacije" class="glyphicon glyphicon-import" aria-hidden="true"></span>&nbsp;
+                        import mreže iz JSON-a
+                    </li>
+                    <li>
+                        Tipka&nbsp;
+                        <span data-toggle="tooltip" title="Pokretanje simulacije" class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>&nbsp;
+                        pomoć (upute, ograničenja)
+                    </li>
+                </ul>
+                <h3>Ograničenja</h3>
+                <ul>
+                    <li>Sustav <strong>ne podržava cikluse u grafu</strong> ako se koristi <strong>Dijkstrin algoritam</strong> za pronalazak primarnog i rezervnog
+                        puta
+                    </li>
+                    <li>Pretpostavka je da su <strong>svi čvorovi idealni</strong>, tj. pouzdanost i raspoloživost im je 1</li>
+                    <li>Neke funkcionalnosti su još u razvoju poput izračuna pouzdanosti/raspoloživosti za cijelu mreži</li>
+                </ul>
             </div>
         </div>
     </div>
