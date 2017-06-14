@@ -123,6 +123,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         d3.select("#runEvaluation").on("click", thisGraph.runEvaluation.bind(this));
         d3.select("#export").on("click", thisGraph.exportGraphAsJSON.bind(this));
         d3.select("#exportresults").on("click", thisGraph.exportResultsAsText.bind(this));
+        d3.select("#getannuallosts").on("click", thisGraph.getAnnualLosts.bind(this));
         document.getElementById("importfile").onchange = function (event) {
             thisGraph.importGraphFromFile.call(thisGraph, this, event);
         };
@@ -858,6 +859,9 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         };
 
         $.post('/evaluation', JSON.stringify(data), function (res) {
+            thisGraph["evaluationResults"] = res;
+            $("#ann-reliability-hid").val(res.reliability);
+            $("#ann-reliability").val(res.reliability);
             setTimeout(function () {
                 $("#runEvaluation .text").show();
                 $("#runEvaluation .loading-spinner").removeClass("in");
@@ -865,6 +869,27 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
                 thisGraph.showEvaluationResult(res);
             }, 1500);
         });
+    }
+
+    GraphCreator.prototype.getAnnualLosts = function () {
+        $("#annuallostmodal .annuallost").hide();
+        $("#annuallostmodal .loading-spinner").addClass("in");
+
+        var thisGraph = this;
+        var capacity = parseFloat($("#capacity").val()) || 0;
+        var mdt = parseFloat($("#mdt").val()) || 0;
+        var r = parseFloat($("#ann-reliability-hid").val()) || 0;
+        var factor = parseFloat($("#factor").val()) || 1;
+
+        var result = capacity * mdt * 60 * factor * r;
+
+
+
+        setTimeout(function () {
+            $(".annuallost h2").text(result.toFixed(2));
+            $("#annuallostmodal .annuallost").show();
+            $("#annuallostmodal .loading-spinner").removeClass("in");
+        }, 1500);
     }
 
     GraphCreator.prototype.showEvaluationResult = function (data) {

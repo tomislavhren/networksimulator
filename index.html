@@ -84,6 +84,9 @@
             <span data-toggle="tooltip" title="Import mreže" class="glyphicon glyphicon glyphicon-import" aria-hidden="true"></span>
             <input type="file" id="importfile" style="position: absolute;left:-9999999px;">
         </a>
+        <a class="annuallostsresults" href="#" data-toggle="modal" data-target="#annuallostmodal">
+            <span data-toggle="tooltip" title="Godišnji gubici" class="glyphicon glyphicon glyphicon-stats" aria-hidden="true"></span>
+        </a>
         <a class="info" href="#" data-toggle="modal" data-target="#informations">
             <span data-toggle="tooltip" title="Pomoć" class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
         </a>
@@ -211,12 +214,57 @@
                 </ul>
                 <h3>Ograničenja</h3>
                 <ul>
-                    <li>Sustav <strong>ne podržava cikluse u grafu</strong> ako se koristi <strong>Dijkstrin algoritam</strong> za pronalazak primarnog i rezervnog
-                        puta
+                    <li>Sustav <strong>ne podržava cikluse u grafu</strong> ako se koristi <strong>Dijkstrin algoritam</strong>                        za pronalazak primarnog i rezervnog puta
                     </li>
                     <li>Pretpostavka je da su <strong>svi čvorovi idealni</strong>, tj. pouzdanost i raspoloživost im je 1</li>
                     <li>Neke funkcionalnosti su još u razvoju poput izračuna pouzdanosti/raspoloživosti za cijelu mrežu</li>
                 </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade bs-example-modal-sm" id="annuallostmodal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content" style="padding: 16px">
+
+                <div class="form-group">
+                    <label for="ann-reliability">Pouzdanost</label>
+                    <input class="form-control" type="number" id="ann-reliability" disabled>
+                    <input type="hidden" id="ann-reliability-hid">
+                </div>
+                <div class="form-group">
+                    <label for="capacity">Kapacitet prijenosa (u Gbit/s)</label>
+                    <input class="form-control" type="number" id="capacity">
+                </div>
+
+                <div class="form-group">
+                    <label for="time">Srednje vrijeme ispada (u minutama)</label>
+                    <input class="form-control" type="number" id="mdt">
+                </div>
+
+                <div class="form-group">
+                    <label for="factor">Faktor iskoristivosti kapaciteta</label>
+                    <input class="form-control" type="number" id="factor">
+                </div>
+
+                <button id="getannuallosts" type="button" class="btn btn-primary">
+                    <span class="text">Izračunaj!</span>
+                    <span class="loading-spinner">
+                        <div class="dots">
+                            <i class="spinner__dot spinner__dot--one"></i>
+                            <i class="spinner__dot spinner__dot--two"></i>
+                            <i class="spinner__dot spinner__dot--three"></i>
+                        </div>
+                    </span>
+                </button>
+
+                <hr>
+
+                <div class="annuallost" style="display: none">
+                    <h3>Godišnji gubitak prometa (<span style="text-transform:lowercase">u</span> G<span style="text-transform:lowercase">bit</span>)</h3>
+                    <h2></h2>
+                </div>
+
             </div>
         </div>
     </div>
