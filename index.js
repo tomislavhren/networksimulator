@@ -231,6 +231,8 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
 
             thisGraph.setIdCt(data.idct);
             thisGraph.updateGraph();
+            thisGraph.updateEdgesList();
+            thisGraph.updateNodesList();
         };
 
         fileReader.readAsText(context.files[0]);
