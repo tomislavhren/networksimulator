@@ -39,6 +39,12 @@ app.post('/evaluation', function (req, res) {
             p["targetTitle"] = p.target.title;
             return p;
         });
+    const nodes = req.body
+        .nodes
+        .map(n => {
+            n["isIncludedInPath"] = null;
+            return n;
+        });
 
     let primaryPath = [];
     let secondaryPath = [];
@@ -54,11 +60,12 @@ app.post('/evaluation', function (req, res) {
             break;
     }
 
-    const disjointProducts = abraham(req.body.nodes, edges, primaryPath, secondaryPath);
+    const disjointProducts = abraham(nodes, edges, primaryPath, secondaryPath, req.body.start, req.body.end);
 
     let reliabilityBetweenNodes = 0;
     let availabilityBetweenNodes = 0;
     disjointProducts.forEach(function (product) {
+        console.log(product.filter(p => p.isIncludedInPath != null).map(p => `${p.stringId} (${p.isIncludedInPath})`))
         let productReliability = 1;
         let productAvailability = 1;
         product.forEach(function (edge) {
@@ -85,7 +92,8 @@ app.post('/evaluation', function (req, res) {
         start: req.body.start,
         end: req.body.end,
         primaryPath: primaryPath,
-        secondaryPath: secondaryPath
+        secondaryPath: secondaryPath,
+        disjointProducts: disjointProducts
     });
 });
 

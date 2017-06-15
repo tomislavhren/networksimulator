@@ -1,4 +1,4 @@
-function Abraham(nodes, edges, primaryPath, secondaryPath) {
+function Abraham(nodes, edges, primaryPath, secondaryPath, startNode, endNode) {
     const primaryPathEdges = extractEdgesPath(edges, primaryPath);
     const secondaryPathEdges = extractEdgesPath(edges, secondaryPath);
     let s1 = [];
@@ -8,10 +8,12 @@ function Abraham(nodes, edges, primaryPath, secondaryPath) {
     edges.forEach(function (edge) {
 
         var s1HasEdge = s1.filter(function (e) {
-            return e.sourceTitle == edge.sourceTitle && e.targetTitle == edge.targetTitle;
+            // return e.sourceTitle == edge.sourceTitle && e.targetTitle == edge.targetTitle;
+            return e.stringId == edge.stringId;
         })[0];
         var s2HasEdge = s2.filter(function (e) {
-            return e.sourceTitle == edge.sourceTitle && e.targetTitle == edge.targetTitle;
+            // return e.sourceTitle == edge.sourceTitle && e.targetTitle == edge.targetTitle;
+            return e.stringId == edge.stringId;
         })[0];
 
         if (!s1HasEdge) s1.push(edge);
@@ -19,8 +21,49 @@ function Abraham(nodes, edges, primaryPath, secondaryPath) {
 
     });
 
-    const x = compare(s2, s1);
+    nodes.forEach(node => {
+        const s1HasNode = s1.some(edge => {
+            return (edge.sourceTitle == node.title || edge.targetTitle == node.title) && edge.isIncludedInPath;
+        });
+        const s2HasNode = s2.some(edge => {
+            return (edge.sourceTitle == node.title || edge.targetTitle == node.title) && edge.isIncludedInPath;
+        });
 
+        if (s1HasNode) {
+            s1.push({
+                stringId: node.stringId,
+                isIncludedInPath: true,
+                reliability: node.reliability,
+                availability: node.availability
+            })
+        } else {
+            s1.push({
+                stringId: node.stringId,
+                isIncludedInPath: null,
+                reliability: node.reliability,
+                availability: node.availability
+            });
+        }
+
+        if (s2HasNode) {
+            s2.push({
+                stringId: node.stringId,
+                isIncludedInPath: true,
+                reliability: node.reliability,
+                availability: node.availability
+            })
+        } else {
+            s2.push({
+                stringId: node.stringId,
+                isIncludedInPath: null,
+                reliability: node.reliability,
+                availability: node.availability
+            });
+        }
+    });
+
+    const x = compare(s2, s1);
+    console.log(x.length);
     /**
      * s2 and s1 are disjoint
      */
@@ -54,10 +97,10 @@ function Abraham(nodes, edges, primaryPath, secondaryPath) {
 
     let result = [s1];
     forSwap.forEach(function (sw) {
-        let obj = s2.slice().map(function(r) {
+        let obj = s2.slice().map(function (r) {
             return {
                 stringId: r.stringId,
-                isIncludedInPath:  sw[r.stringId] != undefined ? sw[r.stringId] : r.isIncludedInPath,
+                isIncludedInPath: sw[r.stringId] != undefined ? sw[r.stringId] : r.isIncludedInPath,
                 reliability: r.reliability,
                 availability: r.availability
             }
@@ -74,7 +117,8 @@ function Abraham(nodes, edges, primaryPath, secondaryPath) {
         let x = [];
         s1.forEach(function (s1Edge) {
             let s2Edge = s2.filter(function (e) {
-                return e.sourceTitle == s1Edge.sourceTitle && e.targetTitle == s1Edge.targetTitle;
+                // return e.sourceTitle == s1Edge.sourceTitle && e.targetTitle == s1Edge.targetTitle;
+                return e.stringId == s1Edge.stringId;
             })[0];
 
             if (s1Edge.isIncludedInPath == true && s2Edge.isIncludedInPath == false) x = 1; // disjunktni su
@@ -84,10 +128,10 @@ function Abraham(nodes, edges, primaryPath, secondaryPath) {
                     isIncludedInPath: s1Edge.isIncludedInPath,
                     linkLength: s1Edge.linkLength,
                     repairRate: s1Edge.repairRate,
-                    sourceTitle: s1Edge.source.title,
-                    targetTitle: s1Edge.target.title,
-                    source: s1Edge.source,
-                    target: s1Edge.target,
+                    sourceTitle: s1Edge.sourceTitle || '',
+                    targetTitle: s1Edge.targetTitle || '',
+                    // source: s1Edge.source,
+                    // target: s1Edge.target,
                     stringId: s1Edge.stringId
                 });
         });
