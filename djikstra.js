@@ -23,7 +23,7 @@ function Dijkstra(start, end, network) {
         });
     });
 
-    result.sort(function (a, b) { return a.cost - b.cost; })
+    result.sort(function (a, b) { return a.cost - b.cost; });
 
     function getCost(path) {
         var sum = 0;
@@ -42,8 +42,19 @@ function Dijkstra(start, end, network) {
     let temp = result[0].path.slice();
     temp.pop();
     temp.shift();
+    
     const secondary = result.find((d) => {
-        return !d.path.some(n => temp.indexOf(n) > -1);
+        var containsEdge = false;
+        for (var i = 1; i < d.path.length; i++) {
+            var index1 = primary.path.indexOf(d.path[i - 1]);
+            var index2 = primary.path.indexOf(d.path[i]);
+
+            if (index1 > -1 && index2 > -1 && (index2 == index1 + 1))
+                containsEdge = true;
+        }
+
+        // return !d.path.some(n => temp.indexOf(n) > -1);
+        return !containsEdge;
     });
 
     return [primary, secondary];

@@ -65,7 +65,6 @@ app.post('/evaluation', function (req, res) {
     let reliabilityBetweenNodes = 0;
     let availabilityBetweenNodes = 0;
     disjointProducts.forEach(function (product) {
-        console.log(product.filter(p => p.isIncludedInPath != null).map(p => `${p.stringId} (${p.isIncludedInPath})`))
         let productReliability = 1;
         let productAvailability = 1;
         product.forEach(function (edge) {

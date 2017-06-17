@@ -352,7 +352,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         var selectedEdge = thisGraph.state.selectedEdge;
         var id = e.target.getAttribute('id');
         this.edges.forEach(function (edge) {
-            if (edge.source == selectedEdge.source && edge.target == selectedEdge.target) {
+            if (selectedEdge && edge.source == selectedEdge.source && edge.target == selectedEdge.target) {
                 edge[id] = parseFloat(e.target.value);
             }
         });
