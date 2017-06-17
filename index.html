@@ -30,11 +30,11 @@
             <input class="form-control input-sm" type="number" id="failureRate">
         </div>
         <div class="form-group">
-            <label for="repairRate">Intenzitet popravka, &mu; (h<sup>-1</sup>)</label>
+            <label for="repairRate">Intenzitet popravaka, &mu; (h<sup>-1</sup>)</label>
             <input class="form-control input-sm" type="number" id="repairRate">
         </div>
         <div class="form-group">
-            <label for="linkLength">Duljina linka (km)</label>
+            <label for="linkLength">Duljina linka, L (km)</label>
             <input class="form-control input-sm" type="number" id="linkLength" disabled>
         </div>
     </div>
@@ -229,18 +229,19 @@
             <div class="modal-content" style="padding: 16px">
 
                 <div class="form-group">
-                    <label for="ann-reliability">Pouzdanost</label>
-                    <input class="form-control" type="number" id="ann-reliability" disabled>
-                    <input type="hidden" id="ann-reliability-hid">
+                    <label for="ann-unavailability">Pouzdanost</label>
+                    <input class="form-control" type="number" id="ann-unavailability" disabled>
+                    <input type="hidden" id="ann-unavailability-hid">
                 </div>
+                
                 <div class="form-group">
-                    <label for="capacity">Kapacitet prijenosa (u Gbit/s)</label>
-                    <input class="form-control" type="number" id="capacity">
+                    <label for="time">Srednje vrijeme ispada (u minutama)</label>
+                    <input class="form-control" type="number" id="mdt" disabled>
                 </div>
 
                 <div class="form-group">
-                    <label for="time">Srednje vrijeme ispada (u minutama)</label>
-                    <input class="form-control" type="number" id="mdt">
+                    <label for="capacity">Kapacitet prijenosa (u Gbit/s)</label>
+                    <input class="form-control" type="number" id="capacity">
                 </div>
 
                 <div class="form-group">

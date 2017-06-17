@@ -510,8 +510,10 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         if (shouldDisable) {
             el.attr('disabled', 'disabled');
             el.val(null);
+            $("label[for=failureRate]").html("Intenzitet kvarova, &lambda; (FIT)");
         }
         else {
+            $("label[for=failureRate]").html("Intenzitet kvarova, &lambda; (FIT/km)");
             el.removeAttr('disabled');
         }
     }
@@ -898,8 +900,9 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
 
         $.post('/evaluation', JSON.stringify(data), function (res) {
             thisGraph["evaluationResults"] = res;
-            $("#ann-reliability-hid").val(res.reliability);
-            $("#ann-reliability").val(res.reliability);
+            $("#ann-unavailability-hid").val(1 - parseFloat(res.availabilty));
+            $("#ann-unavailability").val(1 - parseFloat(res.availabilty));
+            $("#mdt").val((1 - parseFloat(res.availabilty)) * 365 * 24 * 600);
             setTimeout(function () {
                 $("#runEvaluation .text").show();
                 $("#runEvaluation .loading-spinner").removeClass("in");
@@ -916,10 +919,10 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
         var thisGraph = this;
         var capacity = parseFloat($("#capacity").val()) || 0;
         var mdt = parseFloat($("#mdt").val()) || 0;
-        var r = parseFloat($("#ann-reliability-hid").val()) || 0;
+        var r = parseFloat($("#ann-unavailability-hid").val()) || 0;
         var factor = parseFloat($("#factor").val()) || 1;
 
-        var result = capacity * mdt * 60 * factor * r;
+        var result = capacity * mdt * 60 * factor;
 
 
 
