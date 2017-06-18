@@ -160,7 +160,6 @@
         position: fixed;
         bottom: 2%;
         right: 2%;
-        width: 250px;
     }
 
     #dashboard *:first-child {
@@ -179,7 +178,7 @@
         box-shadow: 1px 1px 13px -4px black;
         width: 100%;
         margin-bottom: 16px;
-        max-height: 23.5vh;
+        max-height: 24.4vh;
         overflow: hidden;
         overflow-y: auto;
     }
@@ -189,11 +188,15 @@
         width: 100%;
     }
 
+    #data-container,
+    #dashboard {
+        width: 290px;
+    }
+
     #data-container {
         position: fixed;
         top: 2%;
         right: 2%;
-        width: 250px;
     }
 
     #controls {
@@ -205,6 +208,10 @@
         justify-content: flex-start;
         align-content: center;
         align-items: center;
+    }
+
+    .form-group {
+        width: 100%;
     }
 
     #controls a {
@@ -321,6 +328,6 @@
         font-size: 15px !important;
     }
 
-       #evaluationresults .modal-content h2 {
+    #evaluationresults .modal-content h2 {
         font-size: 20px !important;
     }

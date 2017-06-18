@@ -548,8 +548,9 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
                 console.log('%c New EDGE created', 'color: yellow');
                 console.log(newEdge);
                 console.log('%c ==============', 'color: yellow');
-                // thisGraph.updateEdgesList();
+
                 thisGraph.updateGraph();
+                thisGraph.updateEdgesList();
             }
         } else {
             // we're in the same node
@@ -610,6 +611,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
                 d = { id: thisGraph.idct++, title: "Č", x: xycoords[0], y: xycoords[1], failureRate: 0, repairRate: 0 };
             thisGraph.nodes.push(d);
             thisGraph.updateNodeSelect();
+            thisGraph.updateNodesList();
             console.log('%c New node created', 'color: lightgreen');
             console.log(d);
             console.log(thisGraph.nodes);
