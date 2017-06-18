@@ -977,7 +977,7 @@ document.onload = (function (d3, saveAs, Blob, undefined) {
     // initial node data
     var nodes = [{ title: "Č1", id: 0, x: xLoc, y: yLoc, repairRate: 0, failureRate: 0 },
     { title: "Č2", id: 1, x: xLoc, y: yLoc + 200, repairRate: 0, failureRate: 0 }];
-    var edges = [{ source: nodes[1], target: nodes[0], linkLength: 1, repairRate: 0, failureRate: 0 }];
+    var edges = [{ source: nodes[0], target: nodes[1], linkLength: 1, repairRate: 0, failureRate: 0 }];
 
     /** MAIN SVG **/
     var svg = d3.select("body").append("svg")
